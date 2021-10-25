@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import ru.akirakozov.sd.refactoring.database.DatabaseManager;
+import ru.akirakozov.sd.refactoring.database.DatabaseManagerImpl;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -38,22 +41,19 @@ public class ServletTest {
 
     @BeforeEach
     private void setup() throws SQLException, IOException {
-        try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db")) {
-            String sql1 = "DROP TABLE IF EXISTS PRODUCT";
-            String sql2 = "CREATE TABLE PRODUCT" +
-                    "(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-                    " NAME           TEXT    NOT NULL, " +
-                    " PRICE          INT     NOT NULL)";
-            Statement stmt = c.createStatement();
+        DatabaseManager databaseManager = new DatabaseManagerImpl();
+        String sql1 = "DROP TABLE IF EXISTS PRODUCT";
+        String sql2 = "CREATE TABLE PRODUCT" +
+                "(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                " NAME           TEXT    NOT NULL, " +
+                " PRICE          INT     NOT NULL)";
 
-            stmt.executeUpdate(sql1);
-            stmt.executeUpdate(sql2);
-            stmt.close();
-        }
+        databaseManager.executeUpdate(sql1);
+        databaseManager.executeUpdate(sql2);
         Mockito.when(response.getWriter()).thenReturn(writer);
     }
 
-    private void addTwoItems () throws IOException {
+    private void addTwoItems() throws IOException, ServletException {
         AddProductServlet addProductServlet = new AddProductServlet();
 
         Mockito.when(request.getParameter("name")).thenReturn("iphone6");
@@ -77,19 +77,19 @@ public class ServletTest {
     }
 
     private List<Item> parseGetProducts(StringWriter stringWriter) {
-        List <Item> items = new ArrayList<>();
-        String [] parsed = stringWriter.toString().split("<html><body>")[1].split(System.lineSeparator());
+        List<Item> items = new ArrayList<>();
+        String[] parsed = stringWriter.toString().split("<html><body>")[1].split(System.lineSeparator());
         for (String s : parsed) {
             if (s.isEmpty() || !Character.isLetter(s.charAt(0)))
                 continue;
-            String [] rawItem = s.split("</br>")[0].split("\t");
-            items.add(new Item (rawItem[0], Integer.parseInt(rawItem[1])));
+            String[] rawItem = s.split("</br>")[0].split("\t");
+            items.add(new Item(rawItem[0], Integer.parseInt(rawItem[1])));
         }
         return items;
     }
 
     @Test
-    public void QuerySumServletTest() throws IOException {
+    public void QuerySumServletTest() throws IOException, ServletException {
         QueryServlet queryServlet = new QueryServlet();
 
         addTwoItems();
@@ -100,7 +100,7 @@ public class ServletTest {
     }
 
     @Test
-    public void QueryMinServletTest() throws IOException {
+    public void QueryMinServletTest() throws IOException, ServletException {
         QueryServlet queryServlet = new QueryServlet();
 
         addTwoItems();
@@ -111,7 +111,7 @@ public class ServletTest {
     }
 
     @Test
-    public void QueryMaxServletTest() throws IOException {
+    public void QueryMaxServletTest() throws IOException, ServletException {
         QueryServlet queryServlet = new QueryServlet();
 
         addTwoItems();
@@ -122,7 +122,7 @@ public class ServletTest {
     }
 
     @Test
-    public void QueryCountServletTest() throws IOException {
+    public void QueryCountServletTest() throws IOException, ServletException {
         QueryServlet queryServlet = new QueryServlet();
 
         addTwoItems();
@@ -133,7 +133,7 @@ public class ServletTest {
     }
 
     @Test
-    public void GetProductServletTest() throws IOException {
+    public void GetProductServletTest() throws IOException, ServletException {
         GetProductsServlet servlet = new GetProductsServlet();
 
         addTwoItems();
