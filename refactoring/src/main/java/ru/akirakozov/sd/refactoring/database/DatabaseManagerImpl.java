@@ -9,7 +9,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     public DatabaseManagerImpl() throws SQLException {
         c = DriverManager.getConnection("jdbc:sqlite:test.db");
-        Statement stmt = c.createStatement();
+        stmt = c.createStatement();
     }
 
     @Override
