@@ -1,37 +1,26 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
-import javax.servlet.http.HttpServlet;
+import ru.akirakozov.sd.refactoring.database.DatabaseManager;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
+import java.sql.SQLException;
 
 /**
  * @author akirakozov
  */
-public class AddProductServlet extends HttpServlet {
+public class AddProductServlet extends AbstractServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGetImpl(HttpServletRequest request, HttpServletResponse response, DatabaseManager databaseManager) throws IOException, SQLException {
         String name = request.getParameter("name");
         long price = Long.parseLong(request.getParameter("price"));
+        String sql = "INSERT INTO PRODUCT " +
+                "(NAME, PRICE) VALUES (\"" + name + "\"," + price + ")";
 
-        try {
-            try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db")) {
-                String sql = "INSERT INTO PRODUCT " +
-                        "(NAME, PRICE) VALUES (\"" + name + "\"," + price + ")";
-                Statement stmt = c.createStatement();
-                stmt.executeUpdate(sql);
-                stmt.close();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        databaseManager.executeUpdate(sql);
 
-        response.setContentType("text/html");
-        response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().println("OK");
     }
 }
