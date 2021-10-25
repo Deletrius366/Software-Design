@@ -1,6 +1,7 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
 import ru.akirakozov.sd.refactoring.database.DatabaseManager;
+import ru.akirakozov.sd.refactoring.html.HtmlResponseBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,21 +16,9 @@ public class QueryServlet extends AbstractServlet {
     private void doQuery(HttpServletResponse response, DatabaseManager databaseManager, String query, String desc, boolean writeItems) {
         try {
             ResultSet rs = databaseManager.executeQuery(query);
-            response.getWriter().println("<html><body>");
-            response.getWriter().println("<h1>" + desc + "</h1>");
+            HtmlResponseBuilder htmlResponseBuilder = new HtmlResponseBuilder();
 
-            if (writeItems) {
-                while (rs.next()) {
-                    String name = rs.getString("name");
-                    int price = rs.getInt("price");
-                    response.getWriter().println(name + "\t" + price + "</br>");
-                }
-            } else {
-                if (rs.next()) {
-                    response.getWriter().println(rs.getInt(1));
-                }
-            }
-            response.getWriter().println("</body></html>");
+            htmlResponseBuilder.writeHtmlResponse(response.getWriter(), rs, desc, writeItems);
 
             rs.close();
         } catch (Exception e) {

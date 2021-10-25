@@ -1,6 +1,7 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
 import ru.akirakozov.sd.refactoring.database.DatabaseManager;
+import ru.akirakozov.sd.refactoring.html.HtmlResponseBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,21 +17,14 @@ public class GetProductsServlet extends AbstractServlet {
 
         try {
             ResultSet rs = databaseManager.executeQuery("SELECT * FROM PRODUCT");
-            response.getWriter().println("<html><body>");
+            HtmlResponseBuilder htmlResponseBuilder = new HtmlResponseBuilder();
 
-            while (rs.next()) {
-                String  name = rs.getString("name");
-                int price  = rs.getInt("price");
-                response.getWriter().println(name + "\t" + price + "</br>");
-            }
+            htmlResponseBuilder.writeHtmlResponse(response.getWriter(), rs, "", true);
 
             rs.close();
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        response.setContentType("text/html");
-        response.setStatus(HttpServletResponse.SC_OK);
     }
 }
