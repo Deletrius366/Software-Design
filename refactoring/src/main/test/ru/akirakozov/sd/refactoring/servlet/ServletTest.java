@@ -8,16 +8,12 @@ import org.mockito.Mockito;
 import ru.akirakozov.sd.refactoring.database.DatabaseManager;
 import ru.akirakozov.sd.refactoring.database.DatabaseManagerImpl;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +49,7 @@ public class ServletTest {
         Mockito.when(response.getWriter()).thenReturn(writer);
     }
 
-    private void addTwoItems() throws IOException, ServletException {
+    private void addTwoItems() {
         AddProductServlet addProductServlet = new AddProductServlet();
 
         Mockito.when(request.getParameter("name")).thenReturn("iphone6");
@@ -67,7 +63,7 @@ public class ServletTest {
 
     private int parseQueryResponse(StringWriter stringWriter) {
         String parsed = stringWriter.toString().split("<html><body>")[1].split(System.lineSeparator())[2];
-        int retVal = 0;
+        int retVal;
         try {
             retVal = Integer.parseInt(parsed);
         } catch (NumberFormatException e) {
@@ -89,7 +85,7 @@ public class ServletTest {
     }
 
     @Test
-    public void QuerySumServletTest() throws IOException, ServletException {
+    public void QuerySumServletTest() {
         QueryServlet queryServlet = new QueryServlet();
 
         addTwoItems();
@@ -100,7 +96,7 @@ public class ServletTest {
     }
 
     @Test
-    public void QueryMinServletTest() throws IOException, ServletException {
+    public void QueryMinServletTest() {
         QueryServlet queryServlet = new QueryServlet();
 
         addTwoItems();
@@ -111,7 +107,7 @@ public class ServletTest {
     }
 
     @Test
-    public void QueryMaxServletTest() throws IOException, ServletException {
+    public void QueryMaxServletTest() {
         QueryServlet queryServlet = new QueryServlet();
 
         addTwoItems();
@@ -122,7 +118,7 @@ public class ServletTest {
     }
 
     @Test
-    public void QueryCountServletTest() throws IOException, ServletException {
+    public void QueryCountServletTest() {
         QueryServlet queryServlet = new QueryServlet();
 
         addTwoItems();
@@ -133,7 +129,7 @@ public class ServletTest {
     }
 
     @Test
-    public void GetProductServletTest() throws IOException, ServletException {
+    public void GetProductServletTest() {
         GetProductsServlet servlet = new GetProductsServlet();
 
         addTwoItems();
